@@ -62,7 +62,8 @@
         </label>
       </div>
       <div class="nice-form-group">
-        <input v-model="user.stress_level" type="number" min="1" max="10" placeholder="Уровень стресса" required> Ваш уровень стресса от 1 до 10
+        <label for="stress-level">Ваш уровень стресса от 1 до 10</label>
+        <input id="stress-level" v-model="user.stress_level" type="number" min="1" max="10" required>
       </div>
       <div class="nice-form-group">
         <input v-model="user.goals" placeholder="Цели регистрации">
@@ -158,10 +159,36 @@ body {
   border-radius: 6px;
   font-size: 14px;
 }
+.nice-form-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4b5563;
+  display: block;
+  margin-bottom: 5px;
+}
 
 .nice-form-group textarea {
   min-height: 80px;
   resize: vertical;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.checkbox-group input {
+  width: 16px;
+  height: 16px;
 }
 
 .checkbox-group label {
