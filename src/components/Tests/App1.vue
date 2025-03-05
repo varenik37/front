@@ -38,6 +38,12 @@ import SecondTest from '../Tests/Test2/SecondTest.vue';
 import ThirdTest from '../Tests/Test2/ThirdTest.vue';
 import FourthTest from '../Tests/Test2/FourthTest.vue';
 import FifthTest from '../Tests/Test2/FifthTest.vue';
+import SovietLogicTest from "../Tests/Test3/SovietLogicTest.vue";
+import SpatialSkillTest from "../Tests/Test3/SpatialThinkingTest.vue";
+import QuickResponseTest from "../Tests/Test3/ReactionTimeTest.vue";
+import NBackMemory from "../Tests/Test3/NBackGame.vue";
+import TimeEvaluator from "../Tests/Test3/TimePerception.vue";
+ 
 
 export default {
   name: 'App',
@@ -53,6 +59,11 @@ export default {
     ThirdTest,
     FourthTest,
     FifthTest,
+    SovietLogicTest,
+    SpatialSkillTest,
+    QuickResponseTest,
+    NBackMemory,
+    TimeEvaluator,
 
   },
   data() {
@@ -69,6 +80,12 @@ export default {
         ThirdTest: 'Концентрация',
         FourthTest: 'Память 2',
         FifthTest: 'Тест струппа',
+        SovietLogicTest: 'Логические загадки',
+        SpatialSkillTest: 'Пространственное мышление 2',
+        QuickResponseTest: 'Реакция 2',
+        NBackMemory: 'Память 3',
+        TimeEvaluator: 'Оценка времени',
+
       },
     };
   },
