@@ -117,10 +117,11 @@ export default {
   methods: {
     async handleSubmit() {
       try {
+        console.log(this.user);
         await this.$store.dispatch('register', this.user);
         this.$router.push('/login');
       } catch (error) {
-        console.error(error);
+        console.log(error);
         alert('Ошибка регистрации. Проверьте данные.');
       }
     },
