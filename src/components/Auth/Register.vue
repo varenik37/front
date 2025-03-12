@@ -3,39 +3,21 @@
     <h1>Регистрация</h1>
     <form @submit.prevent="handleSubmit">
       <div class="nice-form-group">
-        <input v-model="user.surname" placeholder="Фамилия" required>
+        <input v-model="user.username" placeholder="Логин" required>
       </div>
       <div class="nice-form-group">
-        <input v-model="user.name" placeholder="Имя" required>
+        <input v-model="user.password" type="password" placeholder="Пароль" required>
       </div>
       <div class="nice-form-group">
-        <input v-model="user.patronymic" placeholder="Отчество">
+        <input v-model="user.age" placeholder="Возраст" required type="number">
       </div>
       <div class="nice-form-group">
-        <input v-model="user.date_of_birth" type="date" placeholder="Дата рождения" required>
+        <input v-model="user.residence" placeholder="Страна" required>
       </div>
       <div class="nice-form-group">
-        <select v-model="user.gender" required>
-          <option value="">Выберите пол</option>
-          <option value="male">Мужской</option>
-          <option value="female">Женский</option>
-        </select>
-      </div>
-      <div class="nice-form-group">
-        <input v-model="user.email" type="email" placeholder="Email" required>
-      </div>
-      <div class="nice-form-group">
-        <input v-model="user.phone_number" placeholder="Номер телефона">
-      </div>
-      <div class="nice-form-group">
-        <input v-model="user.city" placeholder="Город" required>
-      </div>
-      <div class="nice-form-group">
-        <input v-model="user.country" placeholder="Страна" required>
-      </div>
-      <div class="nice-form-group">
-        <select v-model="user.education_level" required>
-          <option value="">Выберите уровень образования</option>
+        <label for="dominant-hand">Выберите уровень образования</label>
+        <select v-model="user.education" required>
+          <option value="" disabled selected>Выберите уровень образования</option>
           <option value="secondary">Среднее</option>
           <option value="higher">Высшее</option>
           <option value="postgraduate">Послевузовское</option>
@@ -43,41 +25,53 @@
         </select>
       </div>
       <div class="nice-form-group">
-        <input v-model="user.other_education" placeholder="Другое образование">
+        <input v-model="user.speciality" placeholder="Специальность" required>
       </div>
       <div class="nice-form-group">
-        <input v-model="user.profession" placeholder="Профессия" required>
+        <input v-model="user.height" placeholder="Рост (см)" type="number">
       </div>
       <div class="nice-form-group">
-        <input v-model="user.workplace" placeholder="Место работы">
+        <input v-model="user.weight" placeholder="Вес (кг)" required type="number">
+      </div>
+      <div class="nice-form-group">
+        <label for="dominant-hand">Ведущая рука</label>
+        <select id="dominant-hand" v-model="user.dominant_hand" required>
+          <option value="" disabled selected>Выберите...</option>
+          <option value="right">Правая</option>
+          <option value="left">Левая</option>
+        </select>
+      </div>
+      <div class="nice-form-group">
+        <input v-model="user.diseases" placeholder="Заболевания" required>
       </div>
       <div class="nice-form-group checkbox-group">
         <label>
-          <input v-model="user.smokes" type="checkbox"> Курите ли вы?
+          <input v-model="user.smoking" type="checkbox"> Курите ли вы?
         </label>
       </div>
       <div class="nice-form-group checkbox-group">
         <label>
-          <input v-model="user.drinks_alcohol" type="checkbox"> Употребляете ли вы алкоголь?
+          <input v-model="user.alcohol" type="checkbox"> Употребляете ли вы алкоголь?
         </label>
-      </div>
-      <div class="nice-form-group">
-        <label for="stress-level">Ваш уровень стресса от 1 до 10</label>
-        <input id="stress-level" v-model="user.stress_level" type="number" min="1" max="10" required>
-      </div>
-      <div class="nice-form-group">
-        <input v-model="user.goals" placeholder="Цели регистрации">
       </div>
       <div class="nice-form-group checkbox-group">
         <label>
-          <input v-model="user.consent" type="checkbox" required> Согласие на обработку данных
+          <input v-model="user.sport" type="checkbox"> Занимаетесь ли вы спортом?
+        </label>
+      </div>
+      <div class="nice-form-group checkbox-group">
+        <label>
+          <input v-model="user.insomnia" type="checkbox"> Есть ли у вас бессоница?
+        </label>
+      </div>
+      <div class="nice-form-group checkbox-group">
+        <label>
+          <input v-model="user.gamer" type="checkbox"> Играете ли вы в компьютерные игры?
         </label>
       </div>
       <div class="nice-form-group">
-        <input v-model="user.password" type="password" placeholder="Пароль" required>
-      </div>
-      <div class="nice-form-group">
-        <textarea v-model="user.additional_comments" placeholder="Дополнительные комментарии"></textarea>
+        <label for="current_mood">Ваше настроение от 1 до 10</label>
+        <input id="current_mood" v-model="user.stress_level" type="number" min="1" max="10" required>
       </div>
       <button type="submit">Зарегистрироваться</button>
     </form>
@@ -91,26 +85,22 @@ export default {
   data() {
     return {
       user: {
-        surname: '',
-        name: '',
-        patronymic: '',
-        date_of_birth: '',
-        gender: '',
-        email: '',
-        phone_number: '',
-        city: '',
-        country: '',
-        education_level: '',
-        other_education: '',
-        profession: '',
-        workplace: '',
-        smokes: false,
-        drinks_alcohol: false,
-        stress_level: 1,
-        goals: '',
-        consent: false,
-        password: '',
-        additional_comments: '',
+        username: '',
+        password: '', // Добавлено поле пароля
+        age: '',
+        residence: '',
+        education: '',
+        speciality: '',
+        height: '',
+        weight: '',
+        dominant_hand: '',
+        diseases: '',
+        smoking: false,
+        alcohol: false,
+        sport: false,
+        insomnia: false,
+        gamer: false,
+        stress_level: 1, // Изменено на stress_level password: '',
       },
     };
   },
@@ -190,12 +180,6 @@ body {
 .checkbox-group input {
   width: 16px;
   height: 16px;
-}
-
-.checkbox-group label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 button {

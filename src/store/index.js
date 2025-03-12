@@ -7,48 +7,88 @@ export default createStore({
     token: localStorage.getItem('token') || null,
   },
   mutations: {
-    setUser(state, user) {
+    setUser (state, user) {
       state.user = user;
     },
     setToken(state, token) {
       state.token = token;
       localStorage.setItem('token', token);
+      axios.defaults.headers.common['Authorization'] = `Token ${token}`; // Устанавливаем заголовок авторизации
     },
     logout(state) {
       state.user = null;
       state.token = null;
       localStorage.removeItem('token');
-      axios.defaults.headers.common['Authorization'] = '';
+      delete axios.defaults.headers.common['Authorization']; // Удаляем заголовок авторизации
     },
   },
   actions: {
     async register({ commit }, userData) {
-      const response = await axios.post('http://localhost:8000/api/register/', userData);
-      commit('setToken', response.data.access);
-      commit('setUser', response.data); // Если бэкенд возвращает данные пользователя
+      try {
+        const response = await axios.post('http://localhost:8000/api/register/', userData);
+        commit('setToken', response.data.token); // Сохраняем токен
+        commit('setUser ', userData); // Сохраняем данные пользователя
+      } catch (error) {
+        console.error('Registration failed:', error);
+        throw error; // Пробрасываем ошибку для обработки в компоненте
+      }
     },
 
     async login({ commit }, credentials) {
-      const response = await axios.post('http://localhost:8000/api/login/', credentials);
-      commit('setToken', response.data.access);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
-      await this.dispatch('fetchUser'); // Загрузка данных пользователя
+      try {
+        const response = await axios.post('http://localhost:8000/api/login/', credentials);
+        commit('setToken', response.data.token); // Сохраняем токен
+        await this.dispatch('fetchUser '); // Загрузка данных пользователя
+      } catch (error) {
+        console.error('Login failed:', error);
+        throw error; // Пробрасываем ошибку для обработки в компоненте
+      }
     },
 
-    async fetchUser({ commit, state }) {
-      console.log(state);
+    async fetchUser ({ commit, state }) {
       if (!state.token) return;
 
       try {
-        const response = await axios.get('http://localhost:8000/api/user/', {
+        const response = await axios.get('http://localhost:8000/api/users/', {
           headers: {
-            Authorization: `Bearer ${state.token}`, // Убедитесь, что токен передаётся
+            Authorization: `Token ${state.token}`, // Убедитесь, что токен передаётся
           },
         });
-        console.log(response);
-        commit('setUser', response.data); // Сохраняем данные пользователя
+        commit('setUser ', response.data); // Сохраняем данные пользователя
       } catch (error) {
         console.error('Failed to fetch user data:', error);
+      }
+    },
+
+    async addTest({ state }, testData) {
+      if (!state.token) return;
+
+      try {
+        const response = await axios.post('http://localhost:8000/api/add-test/', testData, {
+          headers: {
+            Authorization: `Token ${state.token}`, // Убедитесь, что токен передаётся
+          },
+        });
+        return response.data; // Возвращаем данные ответа
+      } catch (error) {
+        console.error('Failed to add test:', error);
+        throw error; // Пробрасываем ошибку для обработки в компоненте
+      }
+    },
+
+    async addResult({ state }, resultData) {
+      if (!state.token) return;
+
+      try {
+        const response = await axios.post('http://localhost:8000/api/add-result/', resultData, {
+          headers: {
+            Authorization: `Token ${state.token}`, // Убедитесь, что токен передаётся
+          },
+        });
+        return response.data; // Возвращаем данные ответа
+      } catch (error) {
+        console.error('Failed to add result:', error);
+        throw error; // Пробрасываем ошибку для обработки в компоненте
       }
     },
   },
