@@ -1,36 +1,34 @@
 <template>
-    <div class="memory-test" @click="handleClick">
-  
-      <div v-if="!testStarted" class="start-screen">
-        <h2>Нажмите, чтобы начать тест</h2>
-        <p>Это тест на краткосрочную память. Вам нужно будет отвечать на простые вопросы связанные с вашей жизнью или картинками из теста. </p>
-      </div>
-  
-      <div v-else-if="currentQuestion <= totalQuestions && !testCompleted" class="test-container">
-        <h2 class="question-count">Вопрос {{ currentQuestion }}/{{ totalQuestions }}</h2>
-  
-        <img :src="currentImage" alt="Вопрос о картинке" class="question-image" />
-        <p>{{ currentQuestionText }}</p>
-  
-        <div class="options">
-          <button
-            v-for="(option, index) in currentOptions"
-            :key="index"
-            @click="checkAnswer(option)"
-          >
-            {{ option }}
-          </button>
-        </div>
-  
-      </div>
-  
-      <div v-if="testCompleted" class="result">
-        <h3>Тест завершен!</h3>
-        <p>Вы правильно ответили на {{ score }} из {{ totalQuestions }} вопросов.</p>
-        <button @click="restartTest">Пройти тест заново</button>
+  <div class="memory-test" @click="handleClick">
+    <div v-if="!testStarted" class="start-screen">
+      <h2>Нажмите, чтобы начать тест</h2>
+      <p>Это тест на краткосрочную память. Вам нужно будет отвечать на простые вопросы связанные с вашей жизнью или картинками из теста.</p>
+    </div>
+
+    <div v-else-if="currentQuestion <= totalQuestions && !testCompleted" class="test-container">
+      <h2 class="question-count">Вопрос {{ currentQuestion }}/{{ totalQuestions }}</h2>
+
+      <img :src="currentImage" alt="Вопрос о картинке" class="question-image" />
+      <p>{{ currentQuestionText }}</p>
+
+      <div class="options">
+        <button
+          v-for="(option, index) in currentOptions"
+          :key="index"
+          @click="checkAnswer(option)"
+        >
+          {{ option }}
+        </button>
       </div>
     </div>
-  </template>
+
+    <div v-if="testCompleted" class="result">
+      <h3>Тест завершен!</h3>
+      <p>Вы правильно ответили на {{ score }} из {{ totalQuestions }} вопросов.</p>
+      <button @click="restartTest">Пройти тест заново</button>
+    </div>
+  </div>
+</template>
   
   <script>
   export default {
@@ -108,45 +106,42 @@
       };
     },
     computed: {
-      currentQuestionText() {
-        return this.questions[this.currentQuestion - 1].text;
-      },
-      currentOptions() {
-        return this.questions[this.currentQuestion - 1].options;
-      },
-      currentImage() {
-        return this.questions[this.currentQuestion - 1].image;
-      },
+    currentQuestionText() {
+      return this.questions[this.currentQuestion - 1].text;
     },
-    methods: {
-      handleClick() {
-        if (!this.testStarted) {
-          this.testStarted = true;
-          this.$emit('test-start');
-        }
-      },
-      checkAnswer(selectedOption) {
-        const correctAnswer = this.questions[this.currentQuestion - 1].answer;
-        if (selectedOption === correctAnswer) {
-          this.score++;
-        }
-  
-        if (this.currentQuestion < this.totalQuestions) {
-          this.currentQuestion++;
-        } else {
-          this.testCompleted = true;
-          this.$emit('test-complete', this.score);
-        }
-      },
-      restartTest() {
-        this.currentQuestion = 1;
-        this.score = 0;
-        this.testCompleted = false
-        this.$emit('test-start');
-      },
+    currentOptions() {
+      return this.questions[this.currentQuestion - 1].options;
     },
-  };
-  </script>
+    currentImage() {
+      return this.questions[this.currentQuestion - 1].image;
+    },
+  },
+  methods: {
+    handleClick() {
+      if (!this.testStarted) {
+        this.testStarted = true;
+      }
+    },
+    checkAnswer(selectedOption) {
+      const correctAnswer = this.questions[this.currentQuestion - 1].answer;
+      if (selectedOption === correctAnswer) {
+        this.score++;
+      }
+
+      if (this.currentQuestion < this.totalQuestions) {
+        this.currentQuestion++;
+      } else {
+        this.testCompleted = true;
+      }
+    },
+    restartTest() {
+      this.currentQuestion = 1;
+      this.score = 0;
+      this.testCompleted = false;
+    },
+  },
+};
+</script>
   
   <style>
   
