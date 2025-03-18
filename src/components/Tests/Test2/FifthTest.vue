@@ -1,25 +1,22 @@
 <template>
-    <div>
-      <div v-if="currentQuestion < questions.length && !isTimeUp">
-        <p :style="{ color: questions[currentQuestion].color }">
-          {{ questions[currentQuestion].word }}
-        </p>
-        <div class="options">
-          <button v-for="color in colors" :key="color" @click="submitAnswer(color)">
-            {{ color }}
-          </button>
-        </div>
-      </div>
-      <div v-else>
-        <h2>Результаты</h2>
-        <p>Ваши ответы: {{ answers.join(', ') }}</p>
-        <p>Правильные ответы: {{ correctAnswers.join(', ') }}</p>
-        <p>Количество правильных ответов: {{ score }} из {{ questions.length }}</p>
-      </div>
-      <div v-if="!isTimeUp">
-        <p>Осталось времени: {{ timeLeft }} секунд</p>
+  <div>
+    <div v-if="currentQuestion < questions.length && !isTimeUp">
+      <p :style="{ color: questions[currentQuestion].color }">
+        {{ questions[currentQuestion].word }}
+      </p>
+      <div class="options">
+        <button v-for="color in colors" :key="color" @click="submitAnswer(color)">
+          {{ color }}
+        </button>
       </div>
     </div>
+    <div v-else>
+      <h2>Результаты</h2>
+      <p>Ваши ответы: {{ answers.join(', ') }}</p>
+      <p>Правильные ответы: {{ correctAnswers.join(', ') }}</p>
+      <p>Количество правильных ответов: {{ score }} из {{ questions.length }}</p>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -31,17 +28,12 @@ export default {
       colors: ['red', 'green', 'blue', 'yellow', 'purple'],
       questions: [],
       answers: [],
-      timeLeft: 30, 
-      timer: null,
       isTimeUp: false, 
     };
   },
   created() {
     this.questions = this.generateQuestions();
-    this.startTimer(); 
-  },
-  beforeUnmount() {
-    clearInterval(this.timer); 
+    this.$emit('test-start');
   },
   computed: {
     correctAnswers() {
@@ -59,7 +51,7 @@ export default {
         let color;
         color = this.colors[Math.floor(Math.random() * this.colors.length)];
         while (color === this.getColorForWord(word)) {
-            color = this.colors[Math.floor(Math.random() * this.colors.length)]; // Если цвет совпадает со словом, то меняем
+          color = this.colors[Math.floor(Math.random() * this.colors.length)]; // Если цвет совпадает со словом, то меняем
         } 
         questions.push({ word, color });
       }
@@ -92,21 +84,20 @@ export default {
       this.answers.push(color);
       this.currentQuestion++;
 
-      
       if (this.currentQuestion >= this.questions.length) {
-        clearInterval(this.timer);
         this.isTimeUp = true;
+        this.$emit('test-complete', this.score, this.questions.length);
       }
-    },
-    startTimer() {
-      this.timer = setInterval(() => {
-        this.timeLeft--;
-        if (this.timeLeft <= 0) {
-          clearInterval(this.timer);
-          this.isTimeUp = true; 
-        }
-      }, 1000);
-    },
+    }
   },
 };
 </script>
+
+<style>
+.options {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+</style>

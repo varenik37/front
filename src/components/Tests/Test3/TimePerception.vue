@@ -27,8 +27,6 @@
       </ul>
       <button class="result-btn" @click="displayResult">Итог</button>
     </div>
-
-    <button class="back-button" @click="$emit('exit')">Назад</button>
   </div>
 </template>
 
@@ -43,6 +41,9 @@ export default {
       measuredTime: null,
       records: [],
     };
+  },
+  mounted() {
+    this.$emit('test-start');
   },
   computed: {
     stateClass() {
@@ -66,6 +67,14 @@ export default {
         this.records.push({ planned: this.chosenSec, measured: elapsed });
         this.measuredTime = elapsed;
         this.isTiming = false;
+        
+        // Если у нас есть 5 или более записей, завершаем тест
+        if (this.records.length >= 5) {
+          setTimeout(() => {
+            this.displayResult();
+            this.$emit('test-complete', this.calculateScore());
+          }, 2000);
+        }
       }
     },
     displayResult() {
@@ -74,6 +83,15 @@ export default {
         this.records.length;
       alert(`Среднее отклонение: ${avgError.toFixed(2)} сек`);
     },
+    calculateScore() {
+      const avgError =
+        this.records.reduce((acc, rec) => acc + Math.abs(rec.planned - rec.measured), 0) /
+        this.records.length;
+      // Расчет оценки: обратно пропорционально ошибке
+      // Если среднее отклонение 0.5 сек или меньше - 10 баллов
+      // Если 2 секунды и больше - 1 балл
+      return Math.max(1, Math.min(10, Math.round(10 - (avgError / 0.2))));
+    }
   },
 };
 </script>
@@ -84,8 +102,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  background-color: transparent;
+  padding: 20px;
 }
 .time-test {
   width: 500px;
@@ -100,6 +117,7 @@ export default {
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   color: white;
+  margin-bottom: 20px;
 }
 .waiting {
   background-color: gray;
@@ -141,16 +159,5 @@ button:disabled {
   padding: 8px 16px;
   font-size: 15px;
   background: #38a169;
-}
-.back-button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 18px;
-  background-color: #42b883;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-}
-.back-button:hover {
-  background-color: #359a6d;
 }
 </style>

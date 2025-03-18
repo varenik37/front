@@ -53,22 +53,32 @@ import SecondTest from './Test2/SecondTest.vue';
 import ThirdTest from './Test2/ThirdTest.vue';
 import FourthTest from './Test2/FourthTest.vue';
 import FifthTest from './Test2/FifthTest.vue';
+import SovietLogicTest from "../Tests/Test3/SovietLogicTest.vue";
+import SpatialSkillTest from "../Tests/Test3/SpatialThinkingTest.vue";
+import QuickResponseTest from "../Tests/Test3/ReactionTimeTest.vue";
+import NBackMemory from "../Tests/Test3/NBackGame.vue";
+import TimeEvaluator from "../Tests/Test3/TimePerception.vue";
 
 export default {
   name: 'TestsApp',
   components: {
-    Timer,
-    AttentionTest,
-    ReactionTest,
-    MemoryTest,
-    TextSelectionTest,
-    SumDigitsTest,
-    FirstTest,
-    SecondTest,
-    ThirdTest,
-    FourthTest,
-    FifthTest,
-  },
+  Timer,
+  AttentionTest,
+  ReactionTest,
+  MemoryTest,
+  TextSelectionTest,
+  SumDigitsTest,
+  FirstTest,
+  SecondTest,
+  ThirdTest,
+  FourthTest,
+  FifthTest,
+  SovietLogicTest,
+  SpatialSkillTest,
+  QuickResponseTest,
+  NBackMemory,
+  TimeEvaluator,
+},
   data() {
     return {
       currentTest: null,
@@ -83,6 +93,11 @@ export default {
         ThirdTest: 'Концентрация',
         FourthTest: 'Память 2',
         FifthTest: 'Тест струппа',
+        SovietLogicTest: 'Логические загадки',
+        SpatialSkillTest: 'Пространственное мышление 2',
+        QuickResponseTest: 'Реакция 2',
+        NBackMemory: 'Память 3',
+        TimeEvaluator: 'Оценка времени',
       },
       testIcons: {
         SumDigitsTest: 'calc',
