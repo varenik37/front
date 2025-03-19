@@ -44,8 +44,10 @@ import QuickResponseTest from "../Tests/Test3/ReactionTimeTest.vue";
 import NBackMemory from "../Tests/Test3/NBackGame.vue";
 import TimeEvaluator from "../Tests/Test3/TimePerception.vue";
 import PuzzleGame from "../Tests/Test5/PuzzleGame.vue";
+import Equals from "../Tests/Test5/Equals.vue";
+import Text from "../Tests/Test5/Text.vue";
+import MultitaskingTest from "./Test5/MultitaskingTest.vue";
 
- 
 
 export default {
   name: 'App',
@@ -67,6 +69,9 @@ export default {
     NBackMemory,
     TimeEvaluator,
     PuzzleGame,
+    Equals,
+    Text,
+    MultitaskingTest,
 
   },
   data() {
@@ -89,6 +94,9 @@ export default {
         NBackMemory: 'Память 3',
         TimeEvaluator: 'Оценка времени',
         PuzzleGame: 'Паззлы',
+        Equals: 'Простой счет',
+        Text: 'Анализ текста',
+        MultitaskingTest: 'Многозадачность',
 
       },
     };
