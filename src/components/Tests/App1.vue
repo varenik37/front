@@ -1,43 +1,58 @@
 <template>
-  
-    <div id="my-app">
-      <h1>Когнитивные тесты</h1>
+  <div class="tests-container">
+    <h1 class="tests-main-title">Когнитивные тесты</h1>
 
-      <!-- Главное меню -->
-      <div v-if="!currentTest" class="menu">
+    <!-- Главное меню -->
+    <div v-if="!currentTest" class="tests-menu">
+      <div class="tests-menu-grid">
         <div
           v-for="(test, key) in tests"
           :key="key"
-          class="menu-item"
+          class="tests-menu-item"
           @click="selectTest(key)"
         >
-          {{ test }}
+          <div class="tests-menu-item-icon">
+            <img :src="getTestIcon(key)" alt="Test icon" class="test-icon" />
+          </div>
+          <div class="tests-menu-item-title">{{ test }}</div>
         </div>
       </div>
-      <div v-else>
-        <Timer ref="timer" />
+    </div>
+    
+    <!-- Контейнер теста -->
+    <div v-else class="test-active-container">
+      <div class="test-header">
+        <h2 class="test-title">{{ tests[currentTest] }}</h2>
+        <Timer ref="timer" class="test-timer" />
+      </div>
+      
+      <div class="test-content">
         <component
           :is="currentTest"
           @test-complete="onTestComplete"
           @test-start="onTestStart"
         />
-        <button @click="backToMenu" class="back-button">Вернуться в меню</button>
       </div>
+      
+      <button @click="backToMenu" class="test-back-button">
+        Вернуться в меню
+      </button>
     </div>
+  </div>
 </template>
 
 <script>
-import Timer from '../Tests/Test1/ThisTimer.vue';
-import AttentionTest from '../Tests/Test1/AttentionTest.vue';
-import ReactionTest from '../Tests/Test1/ReactionTest.vue';
-import MemoryTest from '../Tests/Test1/MemoryTest.vue';
-import TextSelectionTest from '../Tests/Test1/TextSelectionTest.vue';
-import SumDigitsTest from '../Tests/Test1/SumDigitsTest.vue';
-import FirstTest from '../Tests/Test2/FirstTest.vue';
-import SecondTest from '../Tests/Test2/SecondTest.vue';
-import ThirdTest from '../Tests/Test2/ThirdTest.vue';
-import FourthTest from '../Tests/Test2/FourthTest.vue';
-import FifthTest from '../Tests/Test2/FifthTest.vue';
+import Timer from './Test1/ThisTimer.vue';
+import AttentionTest from './Test1/AttentionTest.vue';
+import ReactionTest from './Test1/ReactionTest.vue';
+import MemoryTest from './Test1/MemoryTest.vue';
+import TextSelectionTest from './Test1/TextSelectionTest.vue';
+import SumDigitsTest from './Test1/SumDigitsTest.vue';
+import FirstTest from './Test2/FirstTest.vue';
+import SecondTest from './Test2/SecondTest.vue';
+import ThirdTest from './Test2/ThirdTest.vue';
+import FourthTest from './Test2/FourthTest.vue';
+import FifthTest from './Test2/FifthTest.vue';
 import SovietLogicTest from "../Tests/Test3/SovietLogicTest.vue";
 import SpatialSkillTest from "../Tests/Test3/SpatialThinkingTest.vue";
 import QuickResponseTest from "../Tests/Test3/ReactionTimeTest.vue";
@@ -47,10 +62,12 @@ import PuzzleGame from "../Tests/Test5/PuzzleGame.vue";
 import Equals from "../Tests/Test5/Equals.vue";
 import Text from "../Tests/Test5/Text.vue";
 import MultitaskingTest from "./Test5/MultitaskingTest.vue";
+import ColorTest from "./Test4/ColorTest.vue";
+import PuzzleGame from "./Test4/PuzzleGame.vue";
 
 
 export default {
-  name: 'App',
+  name: 'TestsApp',
   components: {
     Timer,
     AttentionTest,
@@ -68,12 +85,13 @@ export default {
     QuickResponseTest,
     NBackMemory,
     TimeEvaluator,
-    PuzzleGame,
     Equals,
     Text,
     MultitaskingTest,
-
+    ColorTest,
+    PuzzleGame,
   },
+  
   data() {
     return {
       currentTest: null,
@@ -93,11 +111,26 @@ export default {
         QuickResponseTest: 'Реакция 2',
         NBackMemory: 'Память 3',
         TimeEvaluator: 'Оценка времени',
-        PuzzleGame: 'Паззлы',
         Equals: 'Простой счет',
         Text: 'Анализ текста',
         MultitaskingTest: 'Многозадачность',
+        ColorTest: 'Различие цветов',
+        PuzzleGame: 'Сборка пазлов'
 
+      },
+      testIcons: {
+        SumDigitsTest: 'calc',
+        AttentionTest: 'eye',
+        ReactionTest: 'bolt',
+        MemoryTest: 'brain',
+        TextSelectionTest: 'text',
+        FirstTest: 'cube',
+        SecondTest: 'attention',
+        ThirdTest: 'focus',
+        FourthTest: 'memory',
+        FifthTest: 'colors',
+        ColorTest: 'palette',
+        PuzzleGame: 'puzzle'
       },
     };
   },
@@ -117,10 +150,12 @@ export default {
     onTestComplete(score, total_test = 10) {
       this.$refs.timer.stopTimer();
       const totalTime = this.$refs.timer.timeElapsed;
-      alert(
-        `Вы завершили тест за ${Math.floor(totalTime / 1000)} секунд. Ваш результат: ${score} из ${total_test}.`
-      );
-      this.backToMenu();
+      
+      // Сохраняем результат теста
+      this.saveTestResult(score, total_test, totalTime);
+      
+      // Показываем результат
+      this.showTestResult(score, total_test, totalTime);
     },
     onTestStart() {
       this.$refs.timer.resetTimer();
@@ -130,111 +165,194 @@ export default {
       this.currentTest = null;
       this.$refs.timer.resetTimer();
     },
+    getTestIcon() {
+      return `/api/placeholder/50/50`;
+    },
+    async saveTestResult(score, total, time) {
+      try {
+        // Здесь должен быть запрос к API для сохранения результатов
+        // Для примера:
+        console.log('Сохранение результатов теста:', {
+          testName: this.tests[this.currentTest],
+          score,
+          total,
+          timeMs: time,
+        });
+      } catch (error) {
+        console.error('Ошибка при сохранении результатов:', error);
+      }
+    },
+    showTestResult(score, total, time) {
+      const seconds = Math.floor(time / 1000);
+      const percentage = Math.round((score / total) * 100);
+      
+      let resultMessage = '';
+      if (percentage >= 90) {
+        resultMessage = 'Отличный результат!';
+      } else if (percentage >= 70) {
+        resultMessage = 'Хороший результат!';
+      } else if (percentage >= 50) {
+        resultMessage = 'Неплохой результат.';
+      } else {
+        resultMessage = 'Есть куда расти.';
+      }
+      
+      alert(`${resultMessage}\nВы завершили тест "${this.tests[this.currentTest]}" за ${seconds} секунд.\nВаш результат: ${score} из ${total} (${percentage}%).`);
+      
+      this.backToMenu();
+    },
   },
 };
 </script>
 
-
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
+
+.tests-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Roboto', sans-serif;
+}
+
+.tests-main-title {
+  font-size: 2.5rem;
+  color: #3b4ce2;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  margin-bottom: 3rem;
+  font-weight: 700;
 }
 
-nav {
-  margin-bottom: 20px;
+.tests-menu {
+  margin-bottom: 3rem;
 }
 
-nav a {
-  margin: 0 10px;
-  text-decoration: none;
-  color: #2c3e50;
+.tests-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
 }
 
-nav a.router-link-exact-active {
-  color: #42b983;
-}
-
-button {
-  background: none;
-  border: none;
-  color: #2c3e50;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-button:hover {
-  text-decoration: underline;
-}
-
-#my-app {
-  width: 100%;
-  box-sizing: border-box;
+.tests-menu-item {
+  background-color: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
   display: flex;
-  align-items: center;
-  justify-content: center;
   flex-direction: column;
-}
-
-.menu {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  padding: 20px;
-}
-
-.menu-item {
-  width: 150px;
-  height: 150px;
-  background-color: #f0f0;
-  background-color: #f0f0f0;
-  border: 2px solid #ccc;
-  color: black;
-  border-radius: 10px;
-  display: flex;
-  justify-content: center;
   align-items: center;
-  font-size: 16px;
-  font-weight: bold;
-  text-align: center;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.3s ease;
 }
 
-.menu-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  background-color: #e0eaff;
-  border-color: #6c91ff;
+.tests-menu-item:hover {
+  transform: translateY(-0.5rem);
+  box-shadow: 0 0.5rem 1.5rem rgba(59, 76, 226, 0.2);
+  background-color: #f0f4ff;
 }
 
-h1 {
+.tests-menu-item-icon {
+  margin-bottom: 1rem;
+  width: 4rem;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f4ff;
+  border-radius: 50%;
+  color: #3b4ce2;
+}
+
+.test-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  object-fit: contain;
+}
+
+.tests-menu-item-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #3b4ce2;
   text-align: center;
-  margin-bottom: 100px;
 }
 
-.back-button {
-  left: 50%;
-  margin-left: -85px;
-  margin-top: 150px;
-  background-color: #6c91ff;
-  color: #fff;
+.test-active-container {
+  background-color: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.test-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.test-title {
+  font-size: 1.5rem;
+  color: #3b4ce2;
+  font-weight: 600;
+}
+
+.test-content {
+  margin-bottom: 2rem;
+}
+
+.test-back-button {
+  display: block;
+  margin: 2rem auto 0;
+  background-color: #3b4ce2;
+  color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
-  position: relative;
+  transition: background-color 0.3s;
 }
 
-.back-button:hover {
-  background-color: #5577cc;
+.test-back-button:hover {
+  background-color: #2538df;
 }
 
-.timer {
-  margin-bottom: 50px;
+/* Переопределение стилей таймера */
+.test-timer {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #4b5563;
+  background-color: #f3f4f6;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+}
+
+/* Адаптивный дизайн */
+@media (max-width: 768px) {
+  .tests-container {
+    padding: 1rem;
+  }
+  
+  .tests-main-title {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .tests-menu-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+  
+  .test-active-container {
+    padding: 1.5rem;
+  }
+  
+  .test-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
 }
 </style>
-

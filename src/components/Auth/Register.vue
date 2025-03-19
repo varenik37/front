@@ -9,13 +9,15 @@
         <input v-model="user.password" type="password" placeholder="Пароль" required>
       </div>
       <div class="nice-form-group">
+        <input v-model="user.password2" type="password" placeholder="Подтверждение пароля" required>
+      </div>
+      <div class="nice-form-group">
         <input v-model="user.age" placeholder="Возраст" required type="number">
       </div>
       <div class="nice-form-group">
         <input v-model="user.residence" placeholder="Страна" required>
       </div>
       <div class="nice-form-group">
-        <label for="dominant-hand">Выберите уровень образования</label>
         <select v-model="user.education" required>
           <option value="" disabled selected>Выберите уровень образования</option>
           <option value="secondary">Среднее</option>
@@ -34,9 +36,8 @@
         <input v-model="user.weight" placeholder="Вес (кг)" required type="number">
       </div>
       <div class="nice-form-group">
-        <label for="dominant-hand">Ведущая рука</label>
         <select id="dominant-hand" v-model="user.dominant_hand" required>
-          <option value="" disabled selected>Выберите...</option>
+          <option value="" disabled selected>Ведущая рука</option>
           <option value="right">Правая</option>
           <option value="left">Левая</option>
         </select>
@@ -75,7 +76,7 @@
       </div>
       <button type="submit">Зарегистрироваться</button>
     </form>
-    <p>Уже есть аккаунт? <router-link to="/login">Войдите</router-link></p>
+    <p class="login-link">Уже есть аккаунт? <router-link to="/login">Войдите</router-link></p>
   </div>
 </template>
 
@@ -86,7 +87,8 @@ export default {
     return {
       user: {
         username: '',
-        password: '', // Добавлено поле пароля
+        password: '',
+        password2: '', // Добавлено поле для подтверждения пароля
         age: '',
         residence: '',
         education: '',
@@ -100,105 +102,229 @@ export default {
         sport: false,
         insomnia: false,
         gamer: false,
-        stress_level: 1, // Изменено на stress_level password: '',
+        stress_level: 1, 
       },
+      passwordConfirm: '',
     };
+  },
+  computed: {
+    passwordError() {
+      if (this.passwordConfirm && this.user.password !== this.passwordConfirm) {
+        return 'Пароли не совпадают';
+      }
+      return '';
+    },
+    isFormValid() {
+      return !this.passwordError && this.user.username && this.user.password;
+    }
   },
   methods: {
     async handleSubmit() {
+      // Проверка на совпадение паролей
+      if (this.user.password !== this.user.password2) {
+        alert('Пароли не совпадают!');
+        return;
+      }
       try {
-        console.log(this.user);
-        await this.$store.dispatch('register', this.user);
+        // Для отладки: добавьте email, даже если его нет в форме
+        const userData = {
+          ...this.user,
+          email: `${this.user.username}@example.com`, // Временно добавляем email для отладки
+          // Преобразуем числовые поля в числа
+          age: this.user.age ? parseInt(this.user.age) : null,
+          height: this.user.height ? parseInt(this.user.height) : null,
+          weight: this.user.weight ? parseInt(this.user.weight) : null,
+        };
+
+        // Отправляем данные на сервер
+        await this.$store.dispatch('register', userData);
         this.$router.push('/login');
       } catch (error) {
-        console.log(error);
-        alert('Ошибка регистрации. Проверьте данные.');
+        console.error('Ошибка регистрации:', error);
+        // Выводим более подробную информацию об ошибке, если она есть
+        if (error.response && error.response.data) {
+          console.error('Детали ошибки:', error.response.data);
+          alert('Ошибка регистрации: ' + JSON.stringify(error.response.data));
+        } else {
+          alert('Ошибка регистрации. Проверьте данные и повторите попытку.');
+        }
       }
     },
   },
-};
+}
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap");
-
-body {
-  font-family: 'Roboto', sans-serif;
-  background: #f3f0e7;
-  color: #4b5563;
-}
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
 
 .auth-container {
-  max-width: 450px;
-  margin: 50px auto;
-  padding: 25px;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
   background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 0.625rem;
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+  color: #3b4ce2;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+h3 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+.form-section {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  background-color: #f9f9fa;
+  border-radius: 0.5rem;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .nice-form-group {
-  margin-bottom: 15px;
+  flex: 1;
+  min-width: 250px;
+}
+
+.nice-form-group label {
+  display: block;
+  margin-bottom: 0.375rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+  font-weight: 500;
 }
 
 .nice-form-group input,
 .nice-form-group select,
 .nice-form-group textarea {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #c0c4c9;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
-.nice-form-group label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #4b5563;
-  display: block;
-  margin-bottom: 5px;
+
+.nice-form-group input:focus,
+.nice-form-group select:focus,
+.nice-form-group textarea:focus {
+  outline: none;
+  border-color: #3b4ce2;
+  box-shadow: 0 0 0 2px rgba(59, 76, 226, 0.1);
 }
 
 .nice-form-group textarea {
-  min-height: 80px;
+  min-height: 5rem;
   resize: vertical;
+}
+
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .checkbox-group {
   display: flex;
   align-items: center;
-  gap: 10px;
 }
 
 .checkbox-group label {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 14px;
+  gap: 0.625rem;
   cursor: pointer;
+  width: auto;
 }
 
 .checkbox-group input {
-  width: 16px;
-  height: 16px;
+  width: 1.125rem;
+  height: 1.125rem;
+  cursor: pointer;
 }
 
 button {
   background: #3b4ce2;
   color: white;
-  padding: 12px;
+  padding: 0.875rem;
   border: none;
-  border-radius: 6px;
-  font-size: 16px;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
   width: 100%;
+  margin-top: 1rem;
+  transition: background 0.3s;
 }
 
-button:hover {
+.submit-btn:hover {
   background: #2538df;
 }
 
-p {
+.submit-btn:disabled {
+  background: #a0a0a0;
+  cursor: not-allowed;
+}
+
+.login-link {
   text-align: center;
-  margin-top: 15px;
+  margin-top: 1.25rem;
+  font-size: 0.875rem;
+}
+
+.login-link a {
+  color: #3b4ce2;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+.error-message {
+  color: #dc2626;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .auth-container {
+    margin: 1rem;
+    padding: 1rem;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+  
+  .nice-form-group {
+    min-width: 100%;
+  }
+  
+  .form-section {
+    padding: 0.875rem;
+  }
+  
+  .checkbox-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

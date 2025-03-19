@@ -31,7 +31,4 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-export default createRouter({
-  history: createWebHistory(),
-  routes,
-});
+export default router;
