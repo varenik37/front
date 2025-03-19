@@ -58,27 +58,31 @@ import SpatialSkillTest from "../Tests/Test3/SpatialThinkingTest.vue";
 import QuickResponseTest from "../Tests/Test3/ReactionTimeTest.vue";
 import NBackMemory from "../Tests/Test3/NBackGame.vue";
 import TimeEvaluator from "../Tests/Test3/TimePerception.vue";
+import ColorTest from "./Test4/ColorTest.vue";
+import PuzzleGame from "./Test4/PuzzleGame.vue";
 
 export default {
   name: 'TestsApp',
   components: {
-  Timer,
-  AttentionTest,
-  ReactionTest,
-  MemoryTest,
-  TextSelectionTest,
-  SumDigitsTest,
-  FirstTest,
-  SecondTest,
-  ThirdTest,
-  FourthTest,
-  FifthTest,
-  SovietLogicTest,
-  SpatialSkillTest,
-  QuickResponseTest,
-  NBackMemory,
-  TimeEvaluator,
-},
+    Timer,
+    AttentionTest,
+    ReactionTest,
+    MemoryTest,
+    TextSelectionTest,
+    SumDigitsTest,
+    FirstTest,
+    SecondTest,
+    ThirdTest,
+    FourthTest,
+    FifthTest,
+    SovietLogicTest,
+    SpatialSkillTest,
+    QuickResponseTest,
+    NBackMemory,
+    TimeEvaluator,
+    ColorTest,
+    PuzzleGame
+  },
   data() {
     return {
       currentTest: null,
@@ -98,6 +102,8 @@ export default {
         QuickResponseTest: 'Реакция 2',
         NBackMemory: 'Память 3',
         TimeEvaluator: 'Оценка времени',
+        ColorTest: 'Различие цветов',
+        PuzzleGame: 'Сборка пазлов'
       },
       testIcons: {
         SumDigitsTest: 'calc',
@@ -110,6 +116,8 @@ export default {
         ThirdTest: 'focus',
         FourthTest: 'memory',
         FifthTest: 'colors',
+        ColorTest: 'palette',
+        PuzzleGame: 'puzzle'
       },
     };
   },
