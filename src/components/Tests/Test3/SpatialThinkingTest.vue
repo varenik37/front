@@ -1,70 +1,78 @@
 <template>
-  <div class="test-container">
-    <h2 class="text-3xl font-bold mb-6">Тест на пространственное мышление</h2>
-    
+  <div class="spatial-test-container">
+    <!-- Начальный экран -->
     <div v-if="!testStarted">
-      <p class="test-description text-xl">
+      <h3 class="test-heading">{{ testName }}</h3>
+      <p class="test-description">
         Этот тест предназначен для изучения вашей способности мысленно визуализировать и производить манипуляции с графическими объектами (напр. вращать фигуры 3D или собирать различные части в определенное целое). Вам будет представлено несколько различных типов заданий. У вас есть 10 минут, чтобы решить 10 вопросов.
-        <br /><br />
-        Как только Вы проставите ответ на последний вопрос, появится кнопка "Завершить тестирование", нажав которую, Вы можете посмотреть результаты. Как только время закончится, тест автоматически завершается, и в зачет идут те ответы, которые Вы успели проставить. Все вопросы, ответы на которые не были проставлены, будут засчитаны как неверные. Попробуйте для тестирования найти свободное время и место, где Вы не будете отвлекаться.
       </p>
-      <h3 class="text-2xl mb-4">Выберите режим теста:</h3>
-      <div class="buttons-container">
-        <button @click="startTest(true)" class="btn btn-blue">С таймером</button>
-        <button @click="startTest(false)" class="btn btn-gray">Без таймера</button>
+      <div class="button-container">
+        <button @click="startTest" class="primary-button">Начать тест</button>
       </div>
-      <button @click="exitToHome" class="btn btn-red mt-4">Выйти</button>
     </div>
     
+    <!-- Экран с вопросами -->
     <div v-else>
+      <h3 class="test-heading">{{ testName }}</h3>
       <div v-if="currentQuestionIndex < questions.length">
-        <p class="mb-2 text-xl">Вопрос {{ currentQuestionIndex + 1 }} из {{ questions.length }}</p>
-        <p class="question-text text-2xl font-semibold">{{ questions[currentQuestionIndex].questionText }}</p>
-        <img :src="questions[currentQuestionIndex].image" alt="Задание" class="question-image" />
-        <div v-if="!testFinished" class="answers">
-          <button v-for="(answer, index) in questions[currentQuestionIndex].answers" :key="index"
-            @click="selectAnswer(index)" class="answer-btn text-xl">
-            {{ answer.text }}
-          </button>
-        </div>
-        <p v-if="isTimed" class="timer text-xl font-bold">Оставшееся время: {{ formatTime(timeLeft) }}</p>
-        <div class="buttons-container">
-          <button v-if="currentQuestionIndex > 0" @click="prevQuestion" class="btn btn-gray">Назад</button>
-          <button @click="exitToHome" class="btn btn-red">Выйти</button>
+        <div class="question-info">Вопрос {{ currentQuestionIndex + 1 }}</div>
+        
+        <div class="question-content">
+          <p class="question-text">
+            {{ questions[currentQuestionIndex].questionText }}
+          </p>
+          <img :src="questions[currentQuestionIndex].image" alt="Задание" class="question-image" />
+          
+          <div class="answer-buttons">
+            <button 
+              v-for="(answer, index) in questions[currentQuestionIndex].answers" 
+              :key="index"
+              @click="selectAnswer(index)" 
+              class="answer-button"
+            >
+              {{ answer.text }}
+            </button>
+          </div>
         </div>
       </div>
-      <div v-if="currentQuestionIndex >= questions.length && !testFinished">
-        <div class="buttons-container">
-          <button @click="prevQuestion" class="btn btn-gray">Назад</button>
-          <button @click="finishTest" class="btn btn-blue">Завершить тестирование</button>
-        </div>
-      </div>
+      
+      <!-- Экран с результатами -->
       <div v-if="testFinished">
-        <h3 class="text-3xl font-bold">Тест завершён!</h3>
-        <p class="text-2xl">Ваш результат: {{ correctAnswers }} / {{ questions.length }}</p>
-        <h4 v-if="mistakes.length" class="text-2xl font-bold mt-4">Ваши ошибки:</h4>
-        <ul v-if="mistakes.length">
-          <li v-for="(mistake, index) in mistakes" :key="index" class="text-red-500 text-xl">
-            Вопрос {{ mistake.questionIndex + 1 }}: Вы выбрали "{{ mistake.selectedAnswer }}", но правильный ответ - "{{ mistake.correctAnswer }}"
-          </li>
-        </ul>
-        <div class="buttons-container">
-          <button @click="exitToHome" class="btn btn-red">Выйти на главную</button>
+        <div class="results-section">
+          <h3>Тест завершен!</h3>
+          <p>Ваш результат: {{ correctAnswers }} / {{ questions.length }}</p>
+          <div v-if="mistakes.length">
+            <h4>Ваши ошибки:</h4>
+            <ul class="mistakes-list">
+              <li v-for="(mistake, index) in mistakes" :key="index" class="mistake-item">
+                Вопрос {{ mistake.questionIndex + 1 }}: Вы выбрали "{{ mistake.selectedAnswer }}", но правильный ответ - "{{ mistake.correctAnswer }}"
+              </li>
+            </ul>
+          </div>
+          <button @click="$emit('test-complete', correctAnswers, questions.length)" class="primary-button">
+            Завершить
+          </button>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-
 <script>
+import pic1 from './static3/test2/1.png';
+import pic2 from './static3/test2/2.png';
+import pic3 from './static3/test2/3.png';
+import pic4 from './static3/test2/4.png';
+import pic5 from './static3/test2/5.png';
+import pic6 from './static3/test2/6.png';
+import pic7 from './static3/test2/7.png';
+import pic8 from './static3/test2/8.jpg';
+import pic9 from './static3/test2/9.png';
+import pic10 from './static3/test2/10.png';
 export default {
   data() {
     return {
       testStarted: false,
-      isTimed: false,
-      timeLeft: 600,
-      timer: null,
       currentQuestionIndex: 0,
       correctAnswers: 0,
       mistakes: [],
@@ -73,129 +81,118 @@ export default {
       questions: [
         {
           questionText: "При правильном соединении верхние части головоломки создадут одну из следующих фигур (1-5). Обратите внимание, что стороны, которые обозначены одинаковыми буквами (А, В, С), должны соприкасаться между собой. Выберите правильный ответ.",
-          image: "src/assets/photos/test2/1.png",
+          image: pic1,
           answers: [
-            { text: "фигура 1", correct: true },
-            { text: "фигура 2", correct: false },
-            { text: "фигура 3", correct: false },
-            { text: "фигура 4", correct: false },
-            { text: "фигура 5", correct: false }
+            { text: "Ответ 1", correct: true },
+            { text: "Ответ 2", correct: false },
+            { text: "Ответ 3", correct: false },
+            { text: "Ответ 4", correct: false },
+            { text: "Ответ 5", correct: false }
           ]
         },
         {
           questionText: "При правильном соединении верхние части головоломки создадут одну из следующих фигур (1-5). Обратите внимание, что стороны, которые обозначены одинаковыми буквами (А, B, С) должны соприкасаться между собой. Выберите правильный ответ.",
-          image: "src/assets/photos/test2/2.png",
+          image: pic2,
           answers: [
-            { text: "фигура 1", correct: false },
-            { text: "фигура 2", correct: false },
-            { text: "фигура 3", correct: false },
-            { text: "фигура 4", correct: false },
-            { text: "фигура 5", correct: true }
+            { text: "Ответ 1", correct: false },
+            { text: "Ответ 2", correct: false },
+            { text: "Ответ 3", correct: false },
+            { text: "Ответ 4", correct: false },
+            { text: "Ответ 5", correct: true }
           ]
         },
         {
           questionText: "Какой из четырех возможных вариантов представляет собой куб в сложенном виде?",
-          image: "src/assets/photos/test2/3.png",
+          image: pic3,
           answers: [
-            { text: "куб 1", correct: false },
-            { text: "куб 2", correct: false },
-            { text: "куб 3", correct: true },
-            { text: "куб 4", correct: false }
+            { text: "Ответ 1", correct: false },
+            { text: "Ответ 2", correct: false },
+            { text: "Ответ 3", correct: true },
+            { text: "Ответ 4", correct: false }
           ]
         },
         {
           questionText: "Какой из четырех возможных вариантов представляет верхний куб, показанный с другого ракурса? Каждая грань куба уникальна и не повторяется.",
-          image: "src/assets/photos/test2/4.png",
+          image: pic4,
           answers: [
-            { text: "куб 1", correct: false },
-            { text: "куб 2", correct: true },
-            { text: "куб 3", correct: false },
-            { text: "куб 4", correct: false }
+            { text: "Ответ 1", correct: false },
+            { text: "Ответ 2", correct: true },
+            { text: "Ответ 3", correct: false },
+            { text: "Ответ 4", correct: false }
           ]
         },
         {
           questionText: "Вверху представлена фигура. Из следующих 5 вариантов выберите один, изображающий ту же фигуру.",
-          image: "src/assets/photos/test2/5.png",
+          image: pic5,
           answers: [
-            { text: "фигура 1", correct: false },
-            { text: "фигура 2", correct: false },
-            { text: "фигура 3", correct: false },
-            { text: "фигура 4", correct: false },
-            { text: "фигура 5", correct: true }
+            { text: "Ответ 1", correct: false },
+            { text: "Ответ 2", correct: false },
+            { text: "Ответ 3", correct: false },
+            { text: "Ответ 4", correct: false },
+            { text: "Ответ 5", correct: true }
           ]
         },
         {
           questionText: "Укажите правильную комбинацию фигур после вращения верхней модели (обе точки должны располагаться в тех же углах).",
-          image: "src/assets/photos/test2/6.png",
+          image: pic6,
           answers: [
-            { text: "фигура A", correct: false },
-            { text: "фигура B", correct: true },
-            { text: "фигура C", correct: false },
-            { text: "фигура D", correct: false },
-            { text: "фигура E", correct: false }
+            { text: "Ответ 1", correct: false },
+            { text: "Ответ 2", correct: true },
+            { text: "Ответ 3", correct: false },
+            { text: "Ответ 4", correct: false },
+            { text: "Ответ 5", correct: false }
           ]
         },
         {
           questionText: "Какое изображение (1-4) является зеркальным отражением верхней фигуры?",
-          image: "src/assets/photos/test2/7.png",
+          image: pic7,
           answers: [
-            { text: "фигура 1", correct: true },
-            { text: "фигура 2", correct: false },
-            { text: "фигура 3", correct: false },
-            { text: "фигура 4", correct: false }
+            { text: "Ответ 1", correct: true },
+            { text: "Ответ 2", correct: false },
+            { text: "Ответ 3", correct: false },
+            { text: "Ответ 4", correct: false }
           ]
         },
         {
           questionText: "При правильном соединении верхние части головоломки создадут одну из следующих фигур (А- Е). Обратите внимание, что стороны, которые обозначены одинаковыми буквами (х, y, z), должны соприкасаться между собой. Выберите правильный ответ.",
-          image: "src/assets/photos/test2/8.jpg",
+          image: pic8,
           answers: [
-            { text: "фигура A", correct: false },
-            { text: "фигура B", correct: true },
-            { text: "фигура C", correct: false },
-            { text: "фигура D", correct: false },
-            { text: "фигура E", correct: false }
+            { text: "Ответ 1", correct: false },
+            { text: "Ответ 2", correct: true },
+            { text: "Ответ 3", correct: false },
+            { text: "Ответ 4", correct: false },
+            { text: "Ответ 5", correct: false }
           ]
         },
         {
           questionText: "Какая из следующих фигур находится внутри квадрата?",
-          image: "src/assets/photos/test2/9.png",
+          image: pic9,
           answers: [
-            { text: "фигура 1", correct: false },
-            { text: "фигура 2", correct: false },
-            { text: "фигура 3", correct: false },
-            { text: "фигура 4", correct: true },
-            { text: "фигура 5", correct: false }
+            { text: "Ответ 1", correct: false },
+            { text: "Ответ 2", correct: false },
+            { text: "Ответ 3", correct: false },
+            { text: "Ответ 4", correct: true },
+            { text: "Ответ 5", correct: false }
           ]
         },
         {
           questionText: "Какая фигура (1-5) получится при сложении данного шаблона бумаги? Выберите правильный ответ.",
-          image: "src/assets/photos/test2/10.png",
+          image: pic10,
           answers: [
-            { text: "фигура 1", correct: false },
-            { text: "фигура 2", correct: false },
-            { text: "фигура 3", correct: true },
-            { text: "фигура 4", correct: false },
-            { text: "фигура 5", correct: false }
+            { text: "Ответ 1", correct: false },
+            { text: "Ответ 2", correct: false },
+            { text: "Ответ 3", correct: true },
+            { text: "Ответ 4", correct: false },
+            { text: "Ответ 5", correct: false }
           ]
         }
       ]
     };
   },
   methods: {
-    startTest(timed) {
+    startTest() {
       this.testStarted = true;
-      this.isTimed = timed;
-      if (timed) this.startTimer();
-    },
-    startTimer() {
-      this.timeLeft = 600;
-      this.timer = setInterval(() => {
-        if (this.timeLeft > 0) {
-          this.timeLeft--;
-        } else {
-          this.finishTest();
-        }
-      }, 1000);
+      this.$emit('test-start');
     },
     selectAnswer(index) {
       const question = this.questions[this.currentQuestionIndex];
@@ -217,52 +214,135 @@ export default {
     },
     nextQuestion() {
       this.currentQuestionIndex++;
+      if (this.currentQuestionIndex >= this.questions.length) {
+        this.testFinished = true;
+      }
     },
     prevQuestion() {
       if (this.currentQuestionIndex > 0) {
         this.currentQuestionIndex--;
       }
-    },
-    finishTest() {
-      if (this.isTimed) clearInterval(this.timer);
-      this.testFinished = true;
-    },
-    formatTime(seconds) {
-      const minutes = Math.floor(seconds / 60);
-      const secs = seconds % 60;
-      return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
-    },
-    exitToHome() {
-      window.location.href = "/";
     }
   }
 };
 </script>
 
 <style scoped>
-.buttons-container {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 12px;
+.spatial-test-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
 }
-.btn {
-  padding: 10px 18px;
-  font-size: 18px;
-  border-radius: 6px;
+
+.test-heading {
+  color: #4a63e7;
+  font-size: 16px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.test-description {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.question-info {
+  font-size: 16px;
   font-weight: bold;
-  transition: background 0.3s;
+  margin-bottom: 10px;
+  text-align: center;
 }
-.btn-blue {
-  background-color: #007bff;
-  color: white;
+
+.question-content {
+  padding: 0; /* Убрали все отступы контейнера */
+  margin-bottom: 10px;
 }
-.btn-gray {
-  background-color: #6c757d;
-  color: white;
+
+.question-text {
+  font-size: 16px !important; /* Принудительно установлен размер шрифта */
+  line-height: 1.4;
+  margin-bottom: 0; /* Убрали все отступы после текста */
+  text-align: center;
 }
-.btn-red {
-  background-color: #dc3545;
+
+.question-image {
+  max-width: 90%;
+  height: auto;
+  display: block;
+  margin: 10px auto; /* Центрирование и минимальный отступ */
+}
+
+.answer-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.answer-button {
+  padding: 8px 20px;
+  border: 1px solid #ccc;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px !important; /* Принудительно установлен размер шрифта */
+  transition: all 0.3s;
+}
+
+.answer-button:hover {
+  background-color: #e0e0e0;
+}
+
+.results-section {
+  text-align: center;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.results-section h3,
+.results-section h4 {
+  font-size: 16px !important; /* Принудительно установлен размер шрифта */
+  margin: 8px 0;
+}
+
+.results-section p {
+  font-size: 16px !important; /* Принудительно установлен размер шрифта */
+  margin: 8px 0;
+}
+
+.mistakes-list {
+  list-style-type: none;
+  padding: 0;
+  text-align: left;
+}
+
+.mistake-item {
+  margin-bottom: 8px;
+  font-size: 16px !important; /* Принудительно установлен размер шрифта */
+}
+
+.button-container {
+  margin: 15px 0;
+  text-align: center;
+}
+
+.primary-button {
+  background-color: #4a63e7;
   color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px !important; /* Принудительно установлен размер шрифта */
+  margin-top: 10px;
+}
+
+.primary-button:hover {
+  opacity: 0.9;
 }
 </style>

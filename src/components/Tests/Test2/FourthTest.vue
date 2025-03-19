@@ -2,14 +2,15 @@
   <div id="app">
     <h1>Запомни числа!</h1>
     <div v-if="!gameOver">
-      <div v-if="showNumbers" class="timer">Осталось времени: {{ time }} секунд</div> <!-- Отображение таймера -->
-      <div class="grid">
-        <div v-if="showNumbers">
+      <div v-if="showNumbers">
+        <div class="grid">
           <div v-for="(number, index) in numbers" :key="index" class="grid-item">
             {{ number }}
           </div>
         </div>
-        <div v-else>
+      </div>
+      <div v-else>
+        <div class="grid">
           <input
             v-for="(input, index) in inputs"
             :key="'input-' + index"
@@ -19,13 +20,12 @@
             class="input-field"
           />
         </div>
+        <button @click="checkAnswers">Проверить</button>
       </div>
-      <button v-if="!showNumbers" @click="checkAnswers">Проверить</button>
     </div>
     <div v-else>
       <h2>Игра окончена!</h2>
       <p>Ваш результат: {{ score }} из 12</p>
-      <button @click="restartGame">Начать заново</button>
     </div>
   </div>
 </template>
@@ -39,41 +39,23 @@ export default {
       showNumbers: true,
       gameOver: false,
       score: 0,
-      time: 30, 
-      timer: null,
     };
   },
-  created() {
-    this.startTimer();
-  },
-  beforeUnmount() {
-    clearInterval(this.timer); 
+  mounted() {
+    this.$emit('test-start');
+    
+    // Автоматически переключаемся на ввод через 30 секунд
+    setTimeout(() => {
+      this.showNumbers = false;
+    }, 30000);
   },
   methods: {
-    startTimer() {
-      this.timer = setInterval(() => {
-        this.time--;
-        if (this.time <= 0) {
-          clearInterval(this.timer);
-          this.showNumbers = false;
-        }
-      }, 1000);
-    },
     checkAnswers() {
       this.score = this.numbers.filter((number, index) => number === Number(this.inputs[index])).length;
       this.gameOver = true;
-      clearInterval(this.timer); 
-    },
-    restartGame() {
-      this.inputs.fill(null);
-      this.showNumbers = true;
-      this.gameOver = false;
-      this.score = 0;
-      this.numbers = Array.from({ length: 12 }, () => Math.floor(Math.random() * 100));
-      this.time = 30; 
-      this.startTimer();
-    },
-  },
+      this.$emit('test-complete', this.score, 12);
+    }
+  }
 };
 </script>
 

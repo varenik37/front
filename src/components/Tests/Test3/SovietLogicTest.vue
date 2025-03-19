@@ -14,7 +14,7 @@
       </button>
       <button v-if="currentTaskIndex > 0" @click="prevTask" class="btn btn-gray">Предыдущая задача</button>
       <button v-if="currentTaskIndex < tasks.length - 1" @click="nextTask" class="btn btn-gray">Следующая задача</button>
-      <button @click="$emit('exit')" class="btn btn-red">Выйти</button>
+
     </div>
 
     <div v-if="showAnswer" class="answer-container">
@@ -158,6 +158,9 @@ export default {
       showAnswer: false,
     };
   },
+  mounted() {
+    this.$emit('test-start');
+  },
   computed: {
     currentTask() {
       return this.tasks[this.currentTaskIndex];
@@ -174,6 +177,12 @@ export default {
       if (this.currentTaskIndex < this.tasks.length - 1) {
         this.currentTaskIndex++;
         this.showAnswer = false;
+      }
+      // Если достигли последней задачи, готовимся завершить
+      if (this.currentTaskIndex === this.tasks.length - 1) {
+        setTimeout(() => {
+          this.$emit('test-complete', 10);
+        }, 60000); // Даем 1 минуту на последнюю задачу
       }
     },
     prevTask() {
@@ -232,13 +241,6 @@ export default {
 }
 .btn-gray:hover {
   background-color: #5a6268;
-}
-.btn-red {
-  background-color: #dc3545;
-  color: white;
-}
-.btn-red:hover {
-  background-color: #c82333;
 }
 .answer-container {
   margin-top: 20px;
