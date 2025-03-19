@@ -29,6 +29,7 @@ export default createStore({
         commit('setToken', response.data.token); // Сохраняем токен
         commit('setUser ', userData); // Сохраняем данные пользователя
       } catch (error) {
+        console.error('Ошибка регистрации:', error.response.data);
         console.error('Registration failed:', error);
         throw error; // Пробрасываем ошибку для обработки в компоненте
       }

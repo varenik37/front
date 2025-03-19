@@ -9,13 +9,15 @@
         <input v-model="user.password" type="password" placeholder="Пароль" required>
       </div>
       <div class="nice-form-group">
+        <input v-model="user.password2" type="password" placeholder="Подтверждение пароля" required>
+      </div>
+      <div class="nice-form-group">
         <input v-model="user.age" placeholder="Возраст" required type="number">
       </div>
       <div class="nice-form-group">
         <input v-model="user.residence" placeholder="Страна" required>
       </div>
       <div class="nice-form-group">
-        <label for="dominant-hand">Выберите уровень образования</label>
         <select v-model="user.education" required>
           <option value="" disabled selected>Выберите уровень образования</option>
           <option value="secondary">Среднее</option>
@@ -34,9 +36,8 @@
         <input v-model="user.weight" placeholder="Вес (кг)" required type="number">
       </div>
       <div class="nice-form-group">
-        <label for="dominant-hand">Ведущая рука</label>
         <select id="dominant-hand" v-model="user.dominant_hand" required>
-          <option value="" disabled selected>Выберите...</option>
+          <option value="" disabled selected>Ведущая рука</option>
           <option value="right">Правая</option>
           <option value="left">Левая</option>
         </select>
@@ -86,7 +87,8 @@ export default {
     return {
       user: {
         username: '',
-        password: '', // Добавлено поле пароля
+        password: '',
+        password2: '', // Добавлено поле для подтверждения пароля
         age: '',
         residence: '',
         education: '',
@@ -100,12 +102,18 @@ export default {
         sport: false,
         insomnia: false,
         gamer: false,
-        stress_level: 1, // Изменено на stress_level password: '',
+        stress_level: 1, 
       },
     };
   },
   methods: {
     async handleSubmit() {
+      // Проверка на совпадение паролей
+      if (this.user.password !== this.user.password2) {
+        alert('Пароли не совпадают!');
+        return;
+      }
+
       try {
         console.log(this.user);
         await this.$store.dispatch('register', this.user);
@@ -116,7 +124,7 @@ export default {
       }
     },
   },
-};
+}
 </script>
 
 <style scoped>
